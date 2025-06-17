@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background= "#EDEDE9"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/et_email_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:backgroundTint="#E3D5CA"
+            android:padding="12dp"
+            android:textColor="#4B4B4B"
+            android:textColorHint="#888888"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/et_password_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:backgroundTint="#E3D5CA"
+            android:padding="12dp"
+            android:textColor="#4B4B4B"
+            android:textColorHint="#888888"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/et_confirm_password_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirm Password"
+            android:backgroundTint="#E3D5CA"
+            android:padding="12dp"
+            android:textColor="#4B4B4B"
+            android:textColorHint="#888888"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:backgroundTint="#D5BDAF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>
