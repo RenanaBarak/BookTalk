@@ -59,5 +59,17 @@
             android:textStyle="bold"
             android:padding="12dp" />
 
+        <Button
+            android:id="@+id/btn_go_to_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? Login"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#D5BDAF"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:padding="12dp" />
+
+
     </LinearLayout>
 </ScrollView>
