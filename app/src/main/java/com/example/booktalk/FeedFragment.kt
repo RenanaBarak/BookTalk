@@ -39,8 +39,12 @@ class FeedFragment : Fragment() {
         postAdapter = PostAdapter(
             posts = mutableListOf(),
             onEditClick = { post ->
-                // TODO: אפשרות לעריכת פוסט בהמשך
-                Toast.makeText(requireContext(), "עריכה עדיין לא זמינה", Toast.LENGTH_SHORT).show()
+                val action = FeedFragmentDirections.actionFeedToCreatePost(
+                    postId = post.id,
+                    bookTitle = post.bookTitle,
+                    recommendation = post.recommendation
+                )
+                findNavController().navigate(action)
             },
             onDeleteClick = { post ->
                 if (post.userId == currentUserId) {

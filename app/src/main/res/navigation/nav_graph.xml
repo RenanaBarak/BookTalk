@@ -4,14 +4,15 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.booktalk.LoginFragment"
         android:label="Login">
+
         <action
             android:id="@+id/action_login_to_feed"
             app:destination="@id/feedFragment" />
+
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
@@ -22,6 +23,11 @@
         android:id="@+id/registerFragment"
         android:name="com.example.booktalk.RegisterFragment"
         android:label="Register">
+
+        <action
+            android:id="@+id/action_register_to_feed"
+            app:destination="@id/feedFragment" />
+
         <action
             android:id="@+id/action_register_to_login"
             app:destination="@id/loginFragment" />
@@ -35,26 +41,28 @@
         <action
             android:id="@+id/action_feed_to_createPost"
             app:destination="@id/createPostFragment" />
-        <action
-            android:id="@+id/action_feed_to_profile"
-            app:destination="@id/profileFragment" />
     </fragment>
-
 
     <fragment
         android:id="@+id/createPostFragment"
         android:name="com.example.booktalk.CreatePostFragment"
         android:label="Create Post">
+        <argument
+            android:name="postId"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="bookTitle"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="recommendation"
+            app:argType="string"
+            android:defaultValue="" />
 
         <action
             android:id="@+id/action_createPost_to_feed"
             app:destination="@id/feedFragment" />
     </fragment>
 
-
-
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.booktalk.ProfileFragment"
-        android:label="Profile" />
 </navigation>

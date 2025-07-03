@@ -48,15 +48,19 @@ class PostViewModel : ViewModel() {
             }
     }
 
-    fun updatePost(post: Post, onResult: (Boolean) -> Unit) {
-        postsCollection.document(post.id)
-            .set(post)
-            .addOnSuccessListener { onResult(true) }
+    fun updatePost(postId: String, bookTitle: String, recommendation: String, onResult: (Boolean) -> Unit) {
+        postsCollection.document(postId)
+            .update("bookTitle", bookTitle, "recommendation", recommendation)
+            .addOnSuccessListener {
+                Log.d("PostViewModel", "Post updated successfully")
+                onResult(true)
+            }
             .addOnFailureListener {
                 Log.e("PostViewModel", "Failed to update post: ${it.message}", it)
                 onResult(false)
             }
     }
+
     fun getAllPosts(onResult: (List<Post>) -> Unit) {
         postsCollection.orderBy("timestamp")
             .get()
