@@ -19,7 +19,10 @@ class CreatePostFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private var editingPostId: String? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentCreatePostBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -29,18 +32,18 @@ class CreatePostFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
-
         if (currentUser == null) {
-            Toast.makeText(requireContext(), "המשתמש אינו מחובר. נא להתחבר כדי לפרסם פוסט.", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "המשתמש אינו מחובר", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.loginFragment)
             return
         }
 
-        // בדיקת האם מדובר בעריכת פוסט
+        // טוען את ערכי העריכה מה-arguments אם יש
         arguments?.let {
             editingPostId = it.getString("postId")
-            val bookTitle = it.getString("bookTitle")
-            val recommendation = it.getString("recommendation")
+            val bookTitle = it.getString("bookTitle") ?: ""
+            val recommendation = it.getString("recommendation") ?: ""
+
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
         }
@@ -55,11 +58,11 @@ class CreatePostFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (editingPostId != null) {
-                // עריכת פוסט קיים
+            if (!editingPostId.isNullOrEmpty()) {
+                // עדכון פוסט קיים
                 postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
                     if (success) {
-                        Toast.makeText(requireContext(), "הפוסט עודכן", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "הפוסט עודכן בהצלחה", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_createPost_to_feed)
                     } else {
                         Toast.makeText(requireContext(), "שגיאה בעדכון הפוסט", Toast.LENGTH_SHORT).show()
@@ -72,7 +75,7 @@ class CreatePostFragment : Fragment() {
                         Toast.makeText(requireContext(), "הפוסט נוצר בהצלחה", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_createPost_to_feed)
                     } else {
-                        Toast.makeText(requireContext(), "שגיאה ביצירת פוסט", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "שגיאה ביצירת הפוסט", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

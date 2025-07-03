@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 
 class PostAdapter(
     private val posts: MutableList<Post>,
@@ -27,11 +29,22 @@ class PostAdapter(
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
         holder.tvBookTitle.text = post.bookTitle
         holder.tvRecommendation.text = post.recommendation
 
-        holder.btnEdit.setOnClickListener { onEditClick(post) }
-        holder.btnDelete.setOnClickListener { onDeleteClick(post) }
+        // הצגת כפתור עריכה רק אם המשתמש הוא יוצר הפוסט
+        if (post.userId == currentUserId) {
+            holder.btnEdit.visibility = View.VISIBLE
+            holder.btnEdit.setOnClickListener { onEditClick(post) }
+
+            holder.btnDelete.visibility = View.VISIBLE
+            holder.btnDelete.setOnClickListener { onDeleteClick(post) }
+        } else {
+            holder.btnEdit.visibility = View.GONE
+            holder.btnDelete.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = posts.size
