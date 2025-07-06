@@ -1,6 +1,7 @@
 package com.example.booktalk
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,7 @@ class CreatePostFragment : Fragment() {
             return
         }
 
-        // טוען את ערכי העריכה מה-arguments אם יש
+        // Load editing values if available
         arguments?.let {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
@@ -53,14 +54,16 @@ class CreatePostFragment : Fragment() {
             val recommendation = binding.etRecommendation.text.toString().trim()
             val userId = currentUser.uid
 
+            Log.d("CreatePostFragment", "Current user ID: $userId")
+
             if (bookTitle.isEmpty() || recommendation.isEmpty()) {
                 Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (!editingPostId.isNullOrEmpty()) {
-                // עדכון פוסט קיים
                 postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
+                    Log.d("CreatePostFragment", "Update post success: $success")
                     if (success) {
                         Toast.makeText(requireContext(), "הפוסט עודכן בהצלחה", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_createPost_to_feed)
@@ -69,8 +72,8 @@ class CreatePostFragment : Fragment() {
                     }
                 }
             } else {
-                // יצירת פוסט חדש
                 postViewModel.createPost(bookTitle, recommendation, userId) { success ->
+                    Log.d("CreatePostFragment", "Create post success: $success")
                     if (success) {
                         Toast.makeText(requireContext(), "הפוסט נוצר בהצלחה", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_createPost_to_feed)

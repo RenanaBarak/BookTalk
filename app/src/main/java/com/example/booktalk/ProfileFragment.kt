@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.navigation.fragment.findNavController
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -37,6 +40,22 @@ class ProfileFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        childFragmentManager.beginTransaction()
+            .replace(R.id.userPostsContainer, UserPostsFragment())
+            .commit()
+
+        // Find the button by ID (make sure the ID matches your layout)
+        val btnEditProfile = view.findViewById<Button>(R.id.btn_edit_profile)
+        btnEditProfile?.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+    }
+
+
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -56,4 +75,7 @@ class ProfileFragment : Fragment() {
                 }
             }
     }
+
+
+
 }

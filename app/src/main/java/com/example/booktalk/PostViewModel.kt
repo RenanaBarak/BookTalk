@@ -10,10 +10,15 @@ class PostViewModel : ViewModel() {
 
     fun createPost(bookTitle: String, recommendation: String, userId: String, onResult: (Boolean) -> Unit) {
         val postId = postsCollection.document().id
-        val post = Post(id = postId, bookTitle = bookTitle, recommendation = recommendation, userId = userId)
+        val post = Post(
+            id = postId,
+            bookTitle = bookTitle,
+            recommendation = recommendation,
+            userId = userId,
+            timestamp = System.currentTimeMillis() // ← This line is crucial
+        )
 
         Log.d("PostViewModel", "Attempting to write post: $post")
-        Log.d("PostViewModel", "Post data = $post")
 
         postsCollection.document(postId).set(post)
             .addOnSuccessListener {
@@ -25,6 +30,7 @@ class PostViewModel : ViewModel() {
                 onResult(false)
             }
     }
+
     fun fetchPosts(onResult: (List<Post>) -> Unit) {
         postsCollection.orderBy("timestamp")
             .get()

@@ -13,6 +13,8 @@ import com.example.booktalk.databinding.FragmentFeedBinding
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
+
 
 
 
@@ -74,10 +76,11 @@ class FeedFragment : Fragment() {
         loadPosts()
     }
 
-    private fun loadPosts() {
-        postViewModel.getAllPosts { posts ->
-            postAdapter.updatePosts(posts)
-        }
+        private fun loadPosts() {
+            postViewModel.getAllPosts { posts ->
+                Log.d("FeedFragment", "Loaded ${posts.size} posts")
+                postAdapter.updatePosts(posts)
+            }
     }
 
     override fun onDestroyView() {
