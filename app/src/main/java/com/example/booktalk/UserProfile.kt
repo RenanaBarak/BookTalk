@@ -6,5 +6,7 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 data class UserProfile(
     var uid: String = "",
     var name: String = "",
-    var bio: String = ""
+    var bio: String = "",
+    val profileImageUrl: String? = null
+
 )

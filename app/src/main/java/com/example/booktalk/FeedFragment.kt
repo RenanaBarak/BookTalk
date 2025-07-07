@@ -1,29 +1,23 @@
 package com.example.booktalk
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.booktalk.databinding.FragmentFeedBinding
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.auth.FirebaseAuth
-import android.util.Log
-
-
+import com.example.booktalk.databinding.FragmentFeedBinding
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class FeedFragment : Fragment() {
 
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
-    private val postViewModel: PostViewModel by viewModels()
-    private lateinit var postAdapter: PostAdapter
+
+    private lateinit var postAdapter: PostAdapterSimple
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,33 +30,7 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-
-        postAdapter = PostAdapter(
-            posts = mutableListOf(),
-            onEditClick = { post ->
-                val action = FeedFragmentDirections.actionFeedToCreatePost(
-                    postId = post.id,
-                    bookTitle = post.bookTitle,
-                    recommendation = post.recommendation
-                )
-                findNavController().navigate(action)
-            },
-            onDeleteClick = { post ->
-                if (post.userId == currentUserId) {
-                    postViewModel.deletePost(post.id) { success ->
-                        if (success) {
-                            Toast.makeText(requireContext(), "הפוסט נמחק", Toast.LENGTH_SHORT).show()
-                            loadPosts()
-                        } else {
-                            Toast.makeText(requireContext(), "שגיאה במחיקה", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "לא ניתן למחוק פוסט של משתמש אחר", Toast.LENGTH_SHORT).show()
-                }
-            }
-        )
+        postAdapter = PostAdapterSimple(mutableListOf())
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -76,12 +44,26 @@ class FeedFragment : Fragment() {
         loadPosts()
     }
 
-        private fun loadPosts() {
-            postViewModel.getAllPosts { posts ->
-                Log.d("FeedFragment", "Loaded ${posts.size} posts")
-                postAdapter.updatePosts(posts)
+    private fun loadPosts() {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("posts")
+            .orderBy("timestamp") // or whatever field you want to sort by
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.w("FeedFragment", "Listen failed.", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val posts = snapshot.documents.mapNotNull { it.toObject(Post::class.java) }
+                    postAdapter.updatePosts(posts)
+                    Log.d("FeedFragment", "Loaded ${posts.size} posts")
+                }
             }
     }
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

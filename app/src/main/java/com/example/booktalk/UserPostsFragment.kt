@@ -31,15 +31,26 @@ class UserPostsFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerUserPosts)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        postAdapter = PostAdapter(postList,
+        postAdapter = PostAdapter(
+            posts = postList,
+            profileData = ProfileHeaderData(
+                name = "",
+                bio = "",
+                email = "",
+                imageUrl = null
+            ),
             onEditClick = { post ->
                 Toast.makeText(context, "Edit clicked: ${post.bookTitle}", Toast.LENGTH_SHORT).show()
-                // TODO: Navigate to edit screen if you have one
+                // TODO: Navigate to edit screen if you want
             },
             onDeleteClick = { post ->
                 deletePost(post)
+            },
+            onEditProfileClick = {
+                // No profile edit here, or provide navigation if needed
             }
         )
+
 
         recyclerView.adapter = postAdapter
 
@@ -58,15 +69,17 @@ class UserPostsFragment : Fragment() {
 
         firestore.collection("posts")
             .whereEqualTo("userId", currentUserId)
-            .get()
-            .addOnSuccessListener { result ->
-                val userPosts = result.mapNotNull { it.toObject(Post::class.java) }
-                Log.d("UserPostsFragment", "Loaded ${userPosts.size} posts for user")
-                postAdapter.updatePosts(userPosts)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Toast.makeText(context, "Failed to load posts", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val userPosts = snapshot.mapNotNull { it.toObject(Post::class.java) }
+                    postAdapter.updatePosts(userPosts)
+                }
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed to load posts", Toast.LENGTH_SHORT).show()
-            }
+
     }
 
 

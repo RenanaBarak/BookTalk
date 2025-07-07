@@ -1,5 +1,6 @@
 package com.example.booktalk
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
@@ -8,5 +9,5 @@ data class Post(
     var bookTitle: String = "",
     var recommendation: String = "",
     var userId: String = "",
-    var timestamp: Long = System.currentTimeMillis()
+    var timestamp: Timestamp? = null   // Change from Long to Timestamp
 )

@@ -9,6 +9,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.navigation.navOptions
+
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -20,7 +22,34 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
 
-        NavigationUI.setupWithNavController(bottomNav, navController)
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.feedFragment -> {
+                    navController.navigate(R.id.feedFragment, null, navOptionsWithClearStack())
+                    true
+                }
+                R.id.createPostFragment -> {
+                    navController.navigate(R.id.createPostFragment, null, navOptionsWithClearStack())
+                    true
+                }
+                R.id.profileFragment -> {
+                    navController.navigate(R.id.profileFragment, null, navOptionsWithClearStack())
+                    true
+                }
+                else -> false
+            }
+        }
+
+
+
+    }
+    fun navOptionsWithClearStack() = androidx.navigation.navOptions {
+        popUpTo(R.id.nav_graph) {
+            inclusive = false
+            saveState = false
+        }
+        launchSingleTop = true
+        restoreState = false
     }
 }
 

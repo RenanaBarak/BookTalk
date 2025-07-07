@@ -34,12 +34,12 @@ class CreatePostFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            Toast.makeText(requireContext(), "המשתמש אינו מחובר", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.loginFragment)
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
             return
         }
 
-        // Load editing values if available
+        // Check if editing an existing post
         arguments?.let {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
@@ -47,6 +47,12 @@ class CreatePostFragment : Fragment() {
 
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
+        }
+
+        // If not editing, clear the fields
+        if (editingPostId.isNullOrEmpty()) {
+            binding.etBookTitle.text?.clear()
+            binding.etRecommendation.text?.clear()
         }
 
         binding.btnSubmit.setOnClickListener {
@@ -57,7 +63,7 @@ class CreatePostFragment : Fragment() {
             Log.d("CreatePostFragment", "Current user ID: $userId")
 
             if (bookTitle.isEmpty() || recommendation.isEmpty()) {
-                Toast.makeText(requireContext(), "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -65,20 +71,25 @@ class CreatePostFragment : Fragment() {
                 postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
                     Log.d("CreatePostFragment", "Update post success: $success")
                     if (success) {
-                        Toast.makeText(requireContext(), "הפוסט עודכן בהצלחה", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Post updated successfully", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_createPost_to_feed)
                     } else {
-                        Toast.makeText(requireContext(), "שגיאה בעדכון הפוסט", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Failed to update post", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
                 postViewModel.createPost(bookTitle, recommendation, userId) { success ->
                     Log.d("CreatePostFragment", "Create post success: $success")
                     if (success) {
-                        Toast.makeText(requireContext(), "הפוסט נוצר בהצלחה", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Post created successfully", Toast.LENGTH_SHORT).show()
+
+                        // Optional: clear the form
+                        binding.etBookTitle.text?.clear()
+                        binding.etRecommendation.text?.clear()
+
                         findNavController().navigate(R.id.action_createPost_to_feed)
                     } else {
-                        Toast.makeText(requireContext(), "שגיאה ביצירת הפוסט", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Failed to create post", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

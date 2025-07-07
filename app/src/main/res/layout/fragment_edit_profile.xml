@@ -9,6 +9,35 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/girl_read_book"/>
+
+            <Button
+                android:id="@+id/btnChangeProfilePicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:backgroundTint="#D5BDAF"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:padding="12dp"/>
+        </LinearLayout>
+
+
         <EditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
@@ -26,19 +55,76 @@
             android:gravity="top"
             android:layout_marginTop="16dp" />
 
+        <LinearLayout
+            android:id="@+id/passwordSection"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/etCurrentPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Current Password"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/etNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New Password"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm New Password"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/btnChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Change Password"
+                android:backgroundTint="#D5BDAF"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:padding="12dp"/>
+        </LinearLayout>
+
+
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#D5BDAF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:padding="12dp"/>
 
         <Button
             android:id="@+id/btnBackToProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Back to Profile"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#D5BDAF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:padding="12dp"/>
+
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:backgroundTint="#D5BDAF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:padding="12dp" />
 
 
 
