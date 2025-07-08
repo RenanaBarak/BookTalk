@@ -4,28 +4,21 @@
     android:id="@+id/feedLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EDEDE9">
+    android:background="@color/bg_light">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="80dp"
+        android:paddingBottom="@dimen/space_large"
         android:clipToPadding="false"
         tools:listitem="@layout/item_post" />
 
-
-
     <Button
         android:id="@+id/btnAddPost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="פוסט חדש"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#D5BDAF"
-        android:padding="12dp"
-        android:layout_margin="16dp"
+        style="@style/AppButton.Primary"
+        android:text="new post"
+        android:layout_margin="@dimen/space_medium"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
 </RelativeLayout>

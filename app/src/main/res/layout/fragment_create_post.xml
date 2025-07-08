@@ -1,63 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EDEDE9"
-    android:padding="16dp">
+    android:background="@color/colorBackground"
+    android:padding="@dimen/margin_medium">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:gravity="center_horizontal">
 
         <TextView
             android:id="@+id/tv_create_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AppTitleText"
             android:text="New Recommendation"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#D5BDAF"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="@dimen/margin_large" />
 
         <EditText
             android:id="@+id/et_book_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Book Title"
-            android:backgroundTint="#E3D5CA"
-            android:padding="12dp"
-            android:textColor="#4B4B4B"
-            android:textColorHint="#888888"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            style="@style/AppEditText"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:hint="Book Title" />
 
         <EditText
             android:id="@+id/et_recommendation"
-            android:layout_width="match_parent"
+            style="@style/AppEditText"
             android:layout_height="150dp"
-            android:hint="Write your recommendation"
-            android:backgroundTint="#E3D5CA"
             android:gravity="top"
-            android:padding="12dp"
-            android:textColor="#4B4B4B"
-            android:textColorHint="#888888"
-            android:textSize="16sp"
-            android:layout_marginBottom="20dp"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:hint="Write your recommendation"
+            android:layout_marginBottom="@dimen/margin_large" />
 
         <Button
             android:id="@+id/btn_submit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:backgroundTint="#D5BDAF"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp" />
-
+            style="@style/AppButton.Primary"
+            android:text="Submit" />
 
     </LinearLayout>
 </ScrollView>

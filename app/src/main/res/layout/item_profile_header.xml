@@ -3,64 +3,59 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="@dimen/margin_large"
     android:gravity="center_horizontal"
-    android:background="#EDEDE9">
+    android:background="@color/colorBackground">
 
     <ImageView
         android:id="@+id/ivProfileImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/profile_image_size"
+        android:layout_height="@dimen/profile_image_size"
         android:src="@drawable/girl_read_book"
         android:scaleType="centerCrop"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="@dimen/margin_large" />
 
     <TextView
         android:id="@+id/tvProfileUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username"
-        android:textSize="26sp"
+        android:textSize="@dimen/text_size_title"
         android:textStyle="bold"
-        android:textColor="#D5BDAF"
-        android:layout_marginBottom="12dp" />
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="@dimen/margin_medium" />
 
     <TextView
         android:id="@+id/tvProfileBio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bio"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_medium"
         android:textStyle="bold"
-        android:textColor="#D5BDAF"
-        android:layout_marginBottom="12dp" />
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="@dimen/margin_medium" />
 
     <TextView
         android:id="@+id/tvUserEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="user@example.com"
-        android:textSize="18sp"
-        android:textColor="#5D5A58"
-        android:layout_marginBottom="16dp" />
+        android:textSize="@dimen/text_size_medium"
+        android:textColor="@color/nav_item_color"
+        android:layout_marginBottom="@dimen/margin_large" />
 
     <Button
         android:id="@+id/btnEditProfile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Edit Profile"
-        android:backgroundTint="#E3D5CA"
-        android:textColor="#4B4B4B"
-        android:textStyle="bold"
-        android:padding="12dp" />
+        style="@style/AppButton.Secondary"
+        android:text="Edit Profile" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Your Book Recommendations"
-        android:textSize="20sp"
+        android:textSize="@dimen/text_size_medium"
         android:textStyle="bold"
-        android:textColor="#4B4B4B"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="12dp" />
+        android:textColor="@color/colorTextPrimary"
+        android:layout_marginTop="@dimen/margin_xlarge"
+        android:layout_marginBottom="@dimen/margin_medium" />
 </LinearLayout>
