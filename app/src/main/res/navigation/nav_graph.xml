@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.booktalk.LoginFragment"
+        android:label="Login">
+
+        <action
+            android:id="@+id/action_login_to_feed"
+            app:destination="@id/feedFragment" />
+
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.booktalk.RegisterFragment"
+        android:label="Register">
+
+        <action
+            android:id="@+id/action_register_to_feed"
+            app:destination="@id/feedFragment" />
+
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/feedFragment"
+        android:name="com.example.booktalk.FeedFragment"
+        android:label="Feed">
+        <action
+            android:id="@+id/action_feed_to_createPost"
+            app:destination="@id/createPostFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPostFragment"
+        android:name="com.example.booktalk.CreatePostFragment"
+        android:label="Create Post">
+        <argument
+            android:name="postId"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="bookTitle"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="recommendation"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <action
+            android:id="@+id/action_createPost_to_feed"
+            app:destination="@id/feedFragment"
+            app:popUpTo="@id/createPostFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_createPost_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.booktalk.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profile_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.booktalk.EditProfileFragment"
+        android:label="Edit Profile">
+    <action
+        android:id="@+id/action_editProfileFragment_to_profileFragment"
+        app:destination="@id/profileFragment" />
+    </fragment>
+
+
+
+
+
+
+
+
+</navigation>
