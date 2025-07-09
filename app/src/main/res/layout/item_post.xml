@@ -14,6 +14,15 @@
         android:orientation="vertical"
         android:padding="@dimen/padding_medium">
 
+        <ImageView
+            android:id="@+id/ivPostImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:visibility="gone"/>
+
+
         <TextView
             android:id="@+id/tvBookTitle"
             android:layout_width="wrap_content"

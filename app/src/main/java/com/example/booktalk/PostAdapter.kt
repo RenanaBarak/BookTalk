@@ -7,12 +7,21 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
+// Data class to hold profile header info
+data class ProfileHeaderData(
+    val name: String,
+    val bio: String,
+    val email: String,
+    val imageUrl: String? = null
+)
+
+
 class PostAdapter(
     private val posts: MutableList<Post>,
-    private val profileData: ProfileHeaderData,          // profile info for header
+    private val profileData: ProfileHeaderData,
     private val onEditClick: (Post) -> Unit,
     private val onDeleteClick: (Post) -> Unit,
-    private val onEditProfileClick: () -> Unit           // edit profile button callback
+    private val onEditProfileClick: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -31,6 +40,7 @@ class PostAdapter(
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.tvBookTitle)
         val recommendation: TextView = itemView.findViewById(R.id.tvRecommendation)
+        val postImage: ImageView = itemView.findViewById(R.id.ivPostImage)
         val edit: TextView = itemView.findViewById(R.id.btnEdit)
         val delete: TextView = itemView.findViewById(R.id.btnDelete)
     }
@@ -63,9 +73,17 @@ class PostAdapter(
             }
             holder.btnEdit.setOnClickListener { onEditProfileClick() }
         } else if (holder is PostViewHolder) {
-            val post = posts[position - 1] // subtract 1 for header position
+            val post = posts[position - 1] // Adjust for header
             holder.title.text = post.bookTitle
             holder.recommendation.text = post.recommendation
+
+            if (!post.imagePath.isNullOrEmpty()) {
+                holder.postImage.visibility = View.VISIBLE
+                Picasso.get().load(post.imagePath).into(holder.postImage)
+            } else {
+                holder.postImage.visibility = View.GONE
+            }
+
             holder.edit.visibility = View.VISIBLE
             holder.delete.visibility = View.VISIBLE
             holder.edit.setOnClickListener { onEditClick(post) }
@@ -79,10 +97,3 @@ class PostAdapter(
         notifyDataSetChanged()
     }
 }
-
-data class ProfileHeaderData(
-    val name: String,
-    val bio: String,
-    val email: String,
-    val imageUrl: String?
-)

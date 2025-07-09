@@ -32,6 +32,24 @@
             android:hint="Write your recommendation"
             android:layout_marginBottom="@dimen/margin_large" />
 
+        <ImageView
+            android:id="@+id/ivPostImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/girl_read_book"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnPickImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Image from Gallery"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+
         <Button
             android:id="@+id/btn_submit"
             style="@style/AppButton.Primary"

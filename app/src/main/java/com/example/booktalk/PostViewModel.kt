@@ -8,14 +8,16 @@ class PostViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val postsCollection = db.collection("posts")
 
-    fun createPost(bookTitle: String, recommendation: String, userId: String, onResult: (Boolean) -> Unit) {
+    fun createPost(bookTitle: String, recommendation: String, userId: String, imageUri: String?, onResult: (Boolean) -> Unit)
+    {
         val postId = postsCollection.document().id
         val post = hashMapOf(
             "id" to postId,
             "bookTitle" to bookTitle,
             "recommendation" to recommendation,
             "userId" to userId,
-            "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp() // ✅ the fix
+            "imageUri" to imageUri,
+            "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
         postsCollection.document(postId).set(post)

@@ -9,5 +9,6 @@ data class Post(
     var bookTitle: String = "",
     var recommendation: String = "",
     var userId: String = "",
-    var timestamp: Timestamp? = null   // Change from Long to Timestamp
+    var imagePath: String? = null,
+    var timestamp: Timestamp? = null
 )

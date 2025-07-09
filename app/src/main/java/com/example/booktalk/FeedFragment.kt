@@ -47,7 +47,7 @@ class FeedFragment : Fragment() {
     private fun loadPosts() {
         val firestore = FirebaseFirestore.getInstance()
         firestore.collection("posts")
-            .orderBy("timestamp") // or whatever field you want to sort by
+            .orderBy("timestamp")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.w("FeedFragment", "Listen failed.", error)

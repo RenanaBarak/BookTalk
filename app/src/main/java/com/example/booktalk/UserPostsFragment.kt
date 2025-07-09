@@ -41,7 +41,7 @@ class UserPostsFragment : Fragment() {
             ),
             onEditClick = { post ->
                 Toast.makeText(context, "Edit clicked: ${post.bookTitle}", Toast.LENGTH_SHORT).show()
-                // TODO: Navigate to edit screen if you want
+
             },
             onDeleteClick = { post ->
                 deletePost(post)

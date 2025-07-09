@@ -30,7 +30,6 @@ class RegisterFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        //  כפתור הרשמה
         binding.btnRegister.setOnClickListener {
             val email = binding.etEmailRegister.text.toString().trim()
             val password = binding.etPasswordRegister.text.toString().trim()
@@ -61,7 +60,6 @@ class RegisterFragment : Fragment() {
                 }
         }
 
-        //  כפתור חזרה ל-Login
         binding.btnGoToLogin.setOnClickListener {
             findNavController().navigate(R.id.action_register_to_login)
         }

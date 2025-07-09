@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- תמונת פרופיל וכפתור שינוי -->
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,7 +38,6 @@
                 android:padding="12dp"/>
         </LinearLayout>
 
-        <!-- שם וביו -->
         <EditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
@@ -56,43 +55,49 @@
             android:gravity="top"
             android:layout_marginTop="16dp" />
 
-        <!-- סיסמה חדשה -->
-        <EditText
-            android:id="@+id/etCurrentPassword"
+        <LinearLayout
+            android:id="@+id/passwordSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Current Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="24dp"/>
+            android:orientation="vertical"
+            android:layout_marginTop="24dp">
 
-        <EditText
-            android:id="@+id/etNewPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="New Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="12dp"/>
+            <EditText
+                android:id="@+id/etCurrentPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Current Password"
+                android:inputType="textPassword"/>
 
-        <EditText
-            android:id="@+id/etConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Confirm New Password"
-            android:inputType="textPassword"
-            android:layout_marginTop="12dp"/>
+            <EditText
+                android:id="@+id/etNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New Password"
+                android:inputType="textPassword"
+                android:layout_marginTop="12dp"/>
 
-        <Button
-            android:id="@+id/btnChangePassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Change Password"
-            android:backgroundTint="#D5BDAF"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp"
-            android:layout_marginTop="16dp"/>
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm New Password"
+                android:inputType="textPassword"
+                android:layout_marginTop="12dp"/>
 
-        <!-- שמירה ויציאה -->
+            <Button
+                android:id="@+id/btnChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Change Password"
+                android:backgroundTint="#D5BDAF"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:padding="12dp"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+
+
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"

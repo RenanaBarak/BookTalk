@@ -11,6 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.booktalk.databinding.FragmentCreatePostBinding
 import com.google.firebase.auth.FirebaseAuth
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
+
 
 class CreatePostFragment : Fragment() {
 
@@ -19,6 +22,16 @@ class CreatePostFragment : Fragment() {
     private val postViewModel: PostViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     private var editingPostId: String? = null
+
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            selectedImageUri = it
+            binding.ivPostImage.setImageURI(it)
+        }
+    }
+
+    private var selectedImageUri: Uri? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,15 +91,13 @@ class CreatePostFragment : Fragment() {
                     }
                 }
             } else {
-                postViewModel.createPost(bookTitle, recommendation, userId) { success ->
-                    Log.d("CreatePostFragment", "Create post success: $success")
+                postViewModel.createPost(bookTitle, recommendation, userId, selectedImageUri?.toString()) { success ->
                     if (success) {
                         Toast.makeText(requireContext(), "Post created successfully", Toast.LENGTH_SHORT).show()
-
-                        // Optional: clear the form
                         binding.etBookTitle.text?.clear()
                         binding.etRecommendation.text?.clear()
-
+                        binding.ivPostImage.setImageResource(0) // Clear image
+                        selectedImageUri = null
                         findNavController().navigate(R.id.action_createPost_to_feed)
                     } else {
                         Toast.makeText(requireContext(), "Failed to create post", Toast.LENGTH_SHORT).show()
@@ -94,6 +105,11 @@ class CreatePostFragment : Fragment() {
                 }
             }
         }
+
+        binding.btnPickImage.setOnClickListener {
+            imagePicker.launch("image/*")
+        }
+
     }
 
     override fun onDestroyView() {
