@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booktalk.databinding.FragmentFeedBinding
 
@@ -30,13 +31,17 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
-
         postAdapter = PostAdapterSimple(mutableListOf())
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = postAdapter
             isNestedScrollingEnabled = true
+        }
+
+
+        binding.btnOpenMap.setOnClickListener {
+            findNavController().navigate(R.id.action_feedFragment_to_postsMapFragment)
         }
 
         showLoading(true)

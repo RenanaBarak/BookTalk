@@ -10,5 +10,8 @@ data class Post(
     var recommendation: String = "",
     var userId: String = "",
     var imagePath: String? = null,
-    var timestamp: Timestamp? = null
+    var timestamp: Timestamp? = null,
+
+    var latitude: Double? = null,
+    var longitude: Double? = null
 )

@@ -65,4 +65,8 @@ dependencies {
 
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.7")
+
 }

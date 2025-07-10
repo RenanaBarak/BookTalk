@@ -15,10 +15,9 @@ data class ProfileHeaderData(
     val imageUrl: String? = null
 )
 
-
 class PostAdapter(
     private val posts: MutableList<Post>,
-    private val profileData: ProfileHeaderData,
+    private var profileData: ProfileHeaderData,
     private val onEditClick: (Post) -> Unit,
     private val onDeleteClick: (Post) -> Unit,
     private val onEditProfileClick: () -> Unit
@@ -95,5 +94,11 @@ class PostAdapter(
         posts.clear()
         posts.addAll(newPosts)
         notifyDataSetChanged()
+    }
+
+
+    fun updateProfileData(newProfileData: ProfileHeaderData) {
+        profileData = newProfileData
+        notifyItemChanged(0) // רק פריט הכותרת מתעדכן
     }
 }

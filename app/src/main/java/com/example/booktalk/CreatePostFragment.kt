@@ -1,18 +1,21 @@
 package com.example.booktalk
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.booktalk.databinding.FragmentCreatePostBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
-import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
 
 class CreatePostFragment : Fragment() {
 
@@ -20,10 +23,14 @@ class CreatePostFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val postViewModel: PostViewModel by activityViewModels()
-
     private lateinit var auth: FirebaseAuth
+
     private var editingPostId: String? = null
     private var selectedImageUri: Uri? = null
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var currentLat: Double? = null
+    private var currentLng: Double? = null
 
     private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -51,7 +58,10 @@ class CreatePostFragment : Fragment() {
             return
         }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        requestLocation()
 
+        // עריכת פוסט קיים
         arguments?.let {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
@@ -59,11 +69,6 @@ class CreatePostFragment : Fragment() {
 
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
-        }
-
-        if (editingPostId.isNullOrEmpty()) {
-            binding.etBookTitle.text?.clear()
-            binding.etRecommendation.text?.clear()
         }
 
         binding.btnSubmit.setOnClickListener {
@@ -81,37 +86,67 @@ class CreatePostFragment : Fragment() {
 
             if (!editingPostId.isNullOrEmpty()) {
                 postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnSubmit.isEnabled = true
-
-                    if (success) {
-                        Toast.makeText(requireContext(), "Post updated successfully", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_createPost_to_profileFragment)
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to update post", Toast.LENGTH_SHORT).show()
-                    }
+                    handlePostResult(success, goToProfile = true)
                 }
             } else {
-                postViewModel.createPost(bookTitle, recommendation, userId, selectedImageUri?.toString()) { success ->
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnSubmit.isEnabled = true
-
-                    if (success) {
-                        Toast.makeText(requireContext(), "Post created successfully", Toast.LENGTH_SHORT).show()
-                        binding.etBookTitle.text?.clear()
-                        binding.etRecommendation.text?.clear()
-                        binding.ivPostImage.setImageResource(0)
-                        selectedImageUri = null
-                        findNavController().navigate(R.id.action_createPost_to_feed)
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to create post", Toast.LENGTH_SHORT).show()
-                    }
+                postViewModel.createPost(
+                    bookTitle,
+                    recommendation,
+                    userId,
+                    selectedImageUri?.toString(),
+                    currentLat,
+                    currentLng
+                ) { success ->
+                    handlePostResult(success, goToProfile = false)
                 }
             }
         }
 
         binding.btnPickImage.setOnClickListener {
             imagePicker.launch("image/*")
+        }
+    }
+
+    private fun handlePostResult(success: Boolean, goToProfile: Boolean) {
+        binding.progressBar.visibility = View.GONE
+        binding.btnSubmit.isEnabled = true
+
+        if (success) {
+            Toast.makeText(requireContext(), "Post saved successfully", Toast.LENGTH_SHORT).show()
+            if (goToProfile) {
+                findNavController().navigate(R.id.action_createPost_to_profileFragment)
+            } else {
+                findNavController().navigate(R.id.action_createPost_to_feed)
+            }
+        } else {
+            Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun requestLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                currentLat = location.latitude
+                currentLng = location.longitude
+                Log.d("CreatePostFragment", "📍 Location from device: $currentLat, $currentLng")
+            } else {
+                // ברירת מחדל: תל אביב
+                currentLat = 32.0853
+                currentLng = 34.7818
+                Log.d("CreatePostFragment", "📍 No location available. Using default: $currentLat, $currentLng")
+            }
+        }.addOnFailureListener {
+            // גם כאן – ברירת מחדל
+            currentLat = 32.0853
+            currentLng = 34.7818
+            Log.e("CreatePostFragment", "❌ Failed to get location. Using default: $currentLat, $currentLng")
         }
     }
 

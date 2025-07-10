@@ -2,9 +2,7 @@ package com.example.booktalk
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booktalk.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
 
 class ProfileFragment : Fragment() {
 
@@ -26,9 +23,9 @@ class ProfileFragment : Fragment() {
     private val postVM: PostViewModel by activityViewModels()
 
     private lateinit var postAdapter: PostAdapter
-    private val posts = mutableListOf<Post>()          // נתוני הפוסטים למסך
+    private val posts = mutableListOf<Post>()
 
-    private var profileData: ProfileHeaderData? = null // כותרת פרופיל
+    private var profileData: ProfileHeaderData? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,47 +44,46 @@ class ProfileFragment : Fragment() {
             return
         }
 
-        // 1) טען פרטי פרופיל (שם, ביו, תמונה)
+        // אתחול RecyclerView
+        setupRecyclerView()
+
+        // טען פרטי פרופיל
         db.collection("users").document(user.uid).get()
             .addOnSuccessListener { doc ->
                 val name = doc.getString("name") ?: "Username"
                 val bio = doc.getString("bio") ?: "Bio"
                 val imageUrl = doc.getString("profileImageUrl")
-                profileData = ProfileHeaderData(name, bio, user.email ?: "", imageUrl)
 
-                // 2) אתחל RecyclerView + Adapter
-                setupRecyclerView()
-
-                // 3) הפעל מאזין בזמן‑אמת לפוסטים של המשתמש דרך ViewModel
-                postVM.listenToUserPosts(user.uid)
-
-                // 4) Observe LiveData – כל שינוי יעדכן את הרשימה
-                postVM.posts.observe(viewLifecycleOwner) { userPosts ->
-                    Log.d("ProfileFragment", "LiveData: ${userPosts.size} posts")
-                    posts.clear()
-                    posts.addAll(userPosts)
-                    postAdapter.notifyDataSetChanged()
-                }
-                binding.btnLogout.setOnClickListener {
-                    auth.signOut()
-                    Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                }
+                val newProfileData = ProfileHeaderData(name, bio, user.email ?: "", imageUrl)
+                profileData = newProfileData
+                postAdapter.updateProfileData(newProfileData)
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
+
+        // האזנה לפוסטים של המשתמש
+        postVM.listenToUserPosts(user.uid)
+        postVM.posts.observe(viewLifecycleOwner) { userPosts ->
+            Log.d("ProfileFragment", "LiveData: ${userPosts.size} posts")
+            posts.clear()
+            posts.addAll(userPosts)
+            postAdapter.notifyDataSetChanged()
+        }
+
+        // כפתור יציאה
+        binding.btnLogout.setOnClickListener {
+            auth.signOut()
+            Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+        }
     }
 
-    /** יצירת האדפטר וה־RecyclerView */
     private fun setupRecyclerView() {
-        val data = profileData ?: return
-
         postAdapter = PostAdapter(
             posts = posts,
-            profileData = data,
+            profileData = profileData ?: ProfileHeaderData("Username", "Bio", "email@example.com"),
             onEditClick = { post ->
-                // מעבר למסך עריכת פוסט
                 val action = ProfileFragmentDirections
                     .actionProfileFragmentToCreatePostFragment(
                         postId = post.id,
@@ -115,7 +111,6 @@ class ProfileFragment : Fragment() {
             adapter = postAdapter
             isNestedScrollingEnabled = false
         }
-
     }
 
     override fun onDestroyView() {

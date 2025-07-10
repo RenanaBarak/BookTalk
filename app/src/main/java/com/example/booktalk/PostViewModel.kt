@@ -54,13 +54,13 @@ class PostViewModel : ViewModel() {
         postsListenerRegistration?.remove()
     }
 
-    // שאר הפונקציות שלך נשארות כמו שהן, אפשר לשמור אותן בלי שינוי
-
     fun createPost(
         bookTitle: String,
         recommendation: String,
         userId: String,
         imageUri: String?,
+        lat: Double?,
+        lng: Double?,
         onResult: (Boolean) -> Unit
     ) {
         val postId = postsCollection.document().id
@@ -70,6 +70,8 @@ class PostViewModel : ViewModel() {
             "recommendation" to recommendation,
             "userId" to userId,
             "imageUri" to imageUri,
+            "latitude" to lat,
+            "longitude" to lng,
             "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
         postsCollection.document(postId).set(post)
