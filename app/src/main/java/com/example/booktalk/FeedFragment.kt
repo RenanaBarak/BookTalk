@@ -30,7 +30,10 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
+        val app = requireActivity().application as MyApp
+        val factory = PostViewModelFactory(app)
+        postViewModel = ViewModelProvider(requireActivity(), factory)[PostViewModel::class.java]
+
         postAdapter = PostAdapterSimple(mutableListOf())
 
         binding.recyclerView.apply {
@@ -38,7 +41,6 @@ class FeedFragment : Fragment() {
             adapter = postAdapter
             isNestedScrollingEnabled = true
         }
-
 
         binding.btnOpenMap.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_postsMapFragment)

@@ -7,19 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booktalk.databinding.FragmentUserPostsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
 
 class UserPostsFragment : Fragment() {
 
     private var _binding: FragmentUserPostsBinding? = null
     private val binding get() = _binding!!
 
-    private val postVM: PostViewModel by activityViewModels()
+    private lateinit var postVM: PostViewModel
     private val db = FirebaseFirestore.getInstance()
 
     private lateinit var postAdapter: PostAdapter
@@ -37,6 +36,10 @@ class UserPostsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val app = requireActivity().application as MyApp
+        val factory = PostViewModelFactory(app)
+        postVM = ViewModelProvider(requireActivity(), factory).get(PostViewModel::class.java)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 

@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.booktalk.databinding.FragmentCreatePostBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -22,7 +22,7 @@ class CreatePostFragment : Fragment() {
     private var _binding: FragmentCreatePostBinding? = null
     private val binding get() = _binding!!
 
-    private val postViewModel: PostViewModel by activityViewModels()
+    private lateinit var postViewModel: PostViewModel
     private lateinit var auth: FirebaseAuth
 
     private var editingPostId: String? = null
@@ -49,6 +49,11 @@ class CreatePostFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // ✅ יצירת ViewModel עם Factory
+        val app = requireActivity().application as MyApp
+        val factory = PostViewModelFactory(app)
+        postViewModel = ViewModelProvider(this, factory).get(PostViewModel::class.java)
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -135,18 +140,16 @@ class CreatePostFragment : Fragment() {
             if (location != null) {
                 currentLat = location.latitude
                 currentLng = location.longitude
-                Log.d("CreatePostFragment", "📍 Location from device: $currentLat, $currentLng")
+                Log.d("CreatePostFragment", "Location from device: $currentLat, $currentLng")
             } else {
-                // ברירת מחדל: תל אביב
                 currentLat = 32.0853
                 currentLng = 34.7818
-                Log.d("CreatePostFragment", "📍 No location available. Using default: $currentLat, $currentLng")
+                Log.d("CreatePostFragment", "No location available. Using default: $currentLat, $currentLng")
             }
         }.addOnFailureListener {
-            // גם כאן – ברירת מחדל
             currentLat = 32.0853
             currentLng = 34.7818
-            Log.e("CreatePostFragment", "❌ Failed to get location. Using default: $currentLat, $currentLng")
+            Log.e("CreatePostFragment", "Failed to get location. Using default: $currentLat, $currentLng")
         }
     }
 

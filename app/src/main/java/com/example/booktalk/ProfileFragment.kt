@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booktalk.databinding.FragmentProfileBinding
@@ -20,7 +20,11 @@ class ProfileFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    private val postVM: PostViewModel by activityViewModels()
+    private val postVM: PostViewModel by lazy {
+        val app = requireActivity().application as MyApp
+        val factory = PostViewModelFactory(app)
+        ViewModelProvider(requireActivity(), factory)[PostViewModel::class.java]
+    }
 
     private lateinit var postAdapter: PostAdapter
     private val posts = mutableListOf<Post>()
@@ -44,10 +48,8 @@ class ProfileFragment : Fragment() {
             return
         }
 
-        // אתחול RecyclerView
         setupRecyclerView()
 
-        // טען פרטי פרופיל
         db.collection("users").document(user.uid).get()
             .addOnSuccessListener { doc ->
                 val name = doc.getString("name") ?: "Username"
@@ -62,7 +64,6 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
 
-        // האזנה לפוסטים של המשתמש
         postVM.listenToUserPosts(user.uid)
         postVM.posts.observe(viewLifecycleOwner) { userPosts ->
             Log.d("ProfileFragment", "LiveData: ${userPosts.size} posts")
@@ -71,7 +72,6 @@ class ProfileFragment : Fragment() {
             postAdapter.notifyDataSetChanged()
         }
 
-        // כפתור יציאה
         binding.btnLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
