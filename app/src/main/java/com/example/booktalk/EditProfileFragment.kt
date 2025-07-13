@@ -7,15 +7,14 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.booktalk.databinding.FragmentEditProfileBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
@@ -36,7 +35,6 @@ class EditProfileFragment : Fragment() {
 
     private val PICK_IMAGE_REQUEST = 1
     private val CAMERA_REQUEST = 2
-
     private val CAMERA_PERMISSION_CODE = 100
     private val STORAGE_PERMISSION_CODE = 101
 
@@ -50,15 +48,19 @@ class EditProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val currentUser = auth.currentUser ?: return
 
-        usersCollection.document(currentUser.uid).get()
+        loadProfile(currentUser.uid)
+        setupButtons()
+        showOrHidePasswordSection(currentUser)
+    }
+
+    private fun loadProfile(uid: String) {
+        usersCollection.document(uid).get()
             .addOnSuccessListener { snapshot ->
                 val profile = snapshot.toObject(UserProfile::class.java)
                 binding.etName.setText(profile?.name ?: "")
                 binding.etBio.setText(profile?.bio ?: "")
-
                 if (!profile?.profileImageUrl.isNullOrEmpty()) {
                     Picasso.get().load(profile?.profileImageUrl).into(binding.profileImageView)
                 }
@@ -66,7 +68,9 @@ class EditProfileFragment : Fragment() {
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
+    }
 
+    private fun setupButtons() {
         binding.btnChangeProfilePicture.setOnClickListener {
             showImagePickerDialog()
         }
@@ -74,14 +78,15 @@ class EditProfileFragment : Fragment() {
         binding.btnSave.setOnClickListener {
             val name = binding.etName.text.toString().trim()
             val bio = binding.etBio.text.toString().trim()
+            val uid = auth.currentUser!!.uid
 
             binding.progressBar.visibility = View.VISIBLE
             binding.btnSave.isEnabled = false
 
             if (selectedImageUri != null) {
-                uploadImageAndSaveProfile(auth.currentUser!!.uid, name, bio, selectedImageUri!!)
+                uploadImageAndSaveProfile(uid, name, bio, selectedImageUri!!)
             } else {
-                saveProfile(auth.currentUser!!.uid, name, bio, null)
+                saveProfile(uid, name, bio, null)
             }
         }
 
@@ -89,48 +94,52 @@ class EditProfileFragment : Fragment() {
             findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
         }
 
-        val providers = auth.currentUser?.providerData
-        val isEmailPasswordUser = providers?.any { it.providerId == "password" } == true
+        binding.btnChangePassword.setOnClickListener {
+            handleChangePassword()
+        }
+    }
 
+    private fun showOrHidePasswordSection(user: FirebaseUser) {
+        val isEmailPasswordUser = user.providerData.any { it.providerId == "password" }
         if (!isEmailPasswordUser) {
             binding.passwordSection.visibility = View.GONE
         }
+    }
 
-        binding.btnChangePassword.setOnClickListener {
-            val currentPassword = binding.etCurrentPassword.text.toString()
-            val newPassword = binding.etNewPassword.text.toString()
-            val confirmPassword = binding.etConfirmPassword.text.toString()
+    private fun handleChangePassword() {
+        val currentPassword = binding.etCurrentPassword.text.toString()
+        val newPassword = binding.etNewPassword.text.toString()
+        val confirmPassword = binding.etConfirmPassword.text.toString()
+        val user = auth.currentUser
 
-            val user = auth.currentUser
-
-            if (newPassword != confirmPassword) {
-                Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (user?.email != null) {
-                val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(user.email!!, currentPassword)
-
-                user.reauthenticate(credential)
-                    .addOnSuccessListener {
-                        user.updatePassword(newPassword)
-                            .addOnSuccessListener {
-                                Toast.makeText(requireContext(), "Password changed", Toast.LENGTH_SHORT).show()
-                                binding.etCurrentPassword.text.clear()
-                                binding.etNewPassword.text.clear()
-                                binding.etConfirmPassword.text.clear()
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(requireContext(), "Failed to change password", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show()
-                    }
-            }
+        if (newPassword != confirmPassword) {
+            Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return
         }
 
+        user?.email?.let { email ->
+            val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(email, currentPassword)
+            user.reauthenticate(credential)
+                .addOnSuccessListener {
+                    user.updatePassword(newPassword)
+                        .addOnSuccessListener {
+                            Toast.makeText(requireContext(), "Password changed", Toast.LENGTH_SHORT).show()
+                            clearPasswordFields()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "Failed to change password", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 
+    private fun clearPasswordFields() {
+        binding.etCurrentPassword.text.clear()
+        binding.etNewPassword.text.clear()
+        binding.etConfirmPassword.text.clear()
     }
 
     private fun showImagePickerDialog() {
@@ -147,8 +156,9 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun checkCameraPermissionAndOpen() {
-        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(android.Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+        val permission = android.Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(permission), CAMERA_PERMISSION_CODE)
         } else {
             openCamera()
         }
@@ -166,7 +176,6 @@ class EditProfileFragment : Fragment() {
         } else {
             openGallery()
         }
-
     }
 
     private fun openCamera() {
@@ -183,24 +192,6 @@ class EditProfileFragment : Fragment() {
         startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera()
-            } else {
-                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
-            }
-        } else if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openGallery()
-            } else {
-                Toast.makeText(requireContext(), "Storage permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -212,9 +203,9 @@ class EditProfileFragment : Fragment() {
                 }
                 CAMERA_REQUEST -> {
                     val photo = data?.extras?.get("data") as? Bitmap
-                    if (photo != null) {
-                        selectedImageUri = saveImageToCache(photo)
-                        binding.profileImageView.setImageBitmap(photo)
+                    photo?.let {
+                        selectedImageUri = saveImageToCache(it)
+                        binding.profileImageView.setImageBitmap(it)
                     }
                 }
             }
@@ -249,33 +240,52 @@ class EditProfileFragment : Fragment() {
                 }
             }
             .addOnFailureListener {
-                binding.progressBar.visibility = View.GONE
-                binding.btnSave.isEnabled = true
-                Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                showSaveError()
             }
     }
 
     private fun saveProfile(uid: String, name: String, bio: String, imageUrl: String?) {
-        val profile = UserProfile(
-            uid = uid,
-            name = name,
-            bio = bio,
-            profileImageUrl = imageUrl ?: ""
-        )
-
+        val profile = UserProfile(uid, name, bio, imageUrl ?: "")
         usersCollection.document(uid).set(profile)
             .addOnSuccessListener {
-                binding.progressBar.visibility = View.GONE
-                binding.btnSave.isEnabled = true
-                Toast.makeText(requireContext(), "Profile saved", Toast.LENGTH_SHORT).show()
+                showSaveSuccess()
             }
             .addOnFailureListener {
-                binding.progressBar.visibility = View.GONE
-                binding.btnSave.isEnabled = true
-                Toast.makeText(requireContext(), "Failed to save profile", Toast.LENGTH_SHORT).show()
+                showSaveError()
             }
     }
 
+    private fun showSaveSuccess() {
+        binding.progressBar.visibility = View.GONE
+        binding.btnSave.isEnabled = true
+        Toast.makeText(requireContext(), "Profile saved", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showSaveError() {
+        binding.progressBar.visibility = View.GONE
+        binding.btnSave.isEnabled = true
+        Toast.makeText(requireContext(), "Failed to save profile", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            CAMERA_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera()
+                } else {
+                    Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+            STORAGE_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openGallery()
+                } else {
+                    Toast.makeText(requireContext(), "Storage permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

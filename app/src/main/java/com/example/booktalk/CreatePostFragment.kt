@@ -95,7 +95,6 @@ class CreatePostFragment : Fragment() {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
             val recommendation = it.getString("recommendation") ?: ""
-
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
         }
@@ -105,56 +104,46 @@ class CreatePostFragment : Fragment() {
         }
 
         binding.btnSubmit.setOnClickListener {
-            val bookTitle = binding.etBookTitle.text.toString().trim()
-            val recommendation = binding.etRecommendation.text.toString().trim()
-            val userId = currentUser.uid
+            submitPost(currentUser.uid)
+        }
+    }
 
-            if (bookTitle.isEmpty() || recommendation.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+    private fun submitPost(userId: String) {
+        val bookTitle = binding.etBookTitle.text.toString().trim()
+        val recommendation = binding.etRecommendation.text.toString().trim()
+
+        if (bookTitle.isEmpty() || recommendation.isEmpty()) {
+            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.progressBar.visibility = View.VISIBLE
+        binding.btnSubmit.isEnabled = false
+
+        if (!editingPostId.isNullOrEmpty()) {
+            postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
+                handlePostResult(success, goToProfile = true)
             }
-
-            binding.progressBar.visibility = View.VISIBLE
-            binding.btnSubmit.isEnabled = false
-
-            if (!editingPostId.isNullOrEmpty()) {
-                postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
-                    handlePostResult(success, goToProfile = true)
+        } else {
+            if (selectedImageUri != null) {
+                uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
+                    if (imageUrl.isNullOrEmpty()) {
+                        Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                        binding.progressBar.visibility = View.GONE
+                        binding.btnSubmit.isEnabled = true
+                        return@uploadImageToCloudinary
+                    }
+                    createNewPost(bookTitle, recommendation, userId, imageUrl)
                 }
             } else {
-                if (selectedImageUri != null) {
-                    uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
-                        if (imageUrl.isNullOrEmpty()) {
-                            Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
-                            binding.progressBar.visibility = View.GONE
-                            binding.btnSubmit.isEnabled = true
-                            return@uploadImageToCloudinary
-                        }
-
-                        postViewModel.createPost(
-                            bookTitle,
-                            recommendation,
-                            userId,
-                            imageUrl,
-                            currentLat,
-                            currentLng
-                        ) { success ->
-                            handlePostResult(success, goToProfile = false)
-                        }
-                    }
-                } else {
-                    postViewModel.createPost(
-                        bookTitle,
-                        recommendation,
-                        userId,
-                        null,
-                        currentLat,
-                        currentLng
-                    ) { success ->
-                        handlePostResult(success, goToProfile = false)
-                    }
-                }
+                createNewPost(bookTitle, recommendation, userId, null)
             }
+        }
+    }
+
+    private fun createNewPost(title: String, recommendation: String, userId: String, imageUrl: String?) {
+        postViewModel.createPost(title, recommendation, userId, imageUrl, currentLat, currentLng) { success ->
+            handlePostResult(success, goToProfile = false)
         }
     }
 
@@ -172,7 +161,8 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun checkCameraPermissionAndOpen() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
         } else {
             openCamera()
@@ -218,21 +208,27 @@ class CreatePostFragment : Fragment() {
         }
     }
 
-    private fun uploadImageToCloudinary(fileUri: Uri, onComplete: (String?) -> Unit) {
-        val contentResolver = requireContext().contentResolver
-        val inputStream = contentResolver.openInputStream(fileUri)
-        val requestBody = inputStream?.readBytes()?.toRequestBody("image/*".toMediaTypeOrNull())
+    private fun buildCloudinaryRequest(fileUri: Uri): Request? {
+        val inputStream = requireContext().contentResolver.openInputStream(fileUri)
+        val requestBody = inputStream?.readBytes()?.toRequestBody("image/*".toMediaTypeOrNull()) ?: return null
 
         val multipartBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("file", "image.jpg", requestBody!!)
+            .addFormDataPart("file", "image.jpg", requestBody)
             .addFormDataPart("upload_preset", UPLOAD_PRESET)
             .build()
 
-        val request = Request.Builder()
+        return Request.Builder()
             .url(CLOUDINARY_UPLOAD_URL)
             .post(multipartBody)
             .build()
+    }
+
+    private fun uploadImageToCloudinary(fileUri: Uri, onComplete: (String?) -> Unit) {
+        val request = buildCloudinaryRequest(fileUri) ?: run {
+            onComplete(null)
+            return
+        }
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -257,8 +253,7 @@ class CreatePostFragment : Fragment() {
 
     private fun requestLocation() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+            != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
         }
