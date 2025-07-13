@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:padding="@dimen/margin_medium">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <EditText
+            android:id="@+id/et_email_register"
+            style="@style/AppEditText"
+            android:hint="Email"
+            android:layout_marginBottom="@dimen/margin_medium" />
+
+        <EditText
+            android:id="@+id/et_password_register"
+            style="@style/AppEditText"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_marginBottom="@dimen/margin_medium" />
+
+        <EditText
+            android:id="@+id/et_confirm_password_register"
+            style="@style/AppEditText"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:layout_marginBottom="@dimen/margin_large" />
+
+        <Button
+            android:id="@+id/btn_register"
+            style="@style/AppButton.Primary"
+            android:text="Register" />
+
+        <Button
+            android:id="@+id/btn_go_to_login"
+            style="@style/AppButton.Secondary"
+            android:text="Already have an account? Login"
+            android:layout_marginTop="@dimen/margin_medium" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>
