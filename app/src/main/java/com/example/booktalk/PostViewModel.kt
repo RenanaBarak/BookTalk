@@ -52,6 +52,15 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         repository.updatePost(postId, bookTitle, recommendation, onResult)
     }
 
+    fun updatePostWithImage(
+        postId: String,
+        bookTitle: String,
+        recommendation: String,
+        imageUrl: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        repository.updatePostWithImage(postId, bookTitle, recommendation, imageUrl, onResult)
+    }
     fun deletePost(postId: String, onResult: (Boolean) -> Unit) {
         repository.deletePost(postId, onResult)
     }

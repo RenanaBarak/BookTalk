@@ -104,6 +104,26 @@ class PostRepository(private val db: AppDatabase) {
             .addOnSuccessListener { onResult(true) }
             .addOnFailureListener { onResult(false) }
     }
+    fun updatePostWithImage(
+        postId: String,
+        bookTitle: String,
+        recommendation: String,
+        imageUrl: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        val data = hashMapOf<String, Any>(
+            "bookTitle" to bookTitle,
+            "recommendation" to recommendation,
+            "imageUri" to imageUrl
+        )
+        FirebaseFirestore.getInstance()
+            .collection("posts")
+            .document(postId)
+            .update(data)
+            .addOnSuccessListener { onResult(true) }
+            .addOnFailureListener { onResult(false) }
+    }
+
 
     fun deletePost(postId: String, onResult: (Boolean) -> Unit) {
         postsCol.document(postId).delete()

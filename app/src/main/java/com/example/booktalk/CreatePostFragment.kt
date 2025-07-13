@@ -120,11 +120,30 @@
             binding.progressBar.visibility = View.VISIBLE
             binding.btnSubmit.isEnabled = false
 
+            // עריכת פוסט קיים
             if (!editingPostId.isNullOrEmpty()) {
-                postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
-                    handlePostResult(success, goToProfile = true)
+                if (selectedImageUri != null) {
+                    uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
+                        if (imageUrl.isNullOrEmpty()) {
+                            Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                            binding.progressBar.visibility = View.GONE
+                            binding.btnSubmit.isEnabled = true
+                            return@uploadImageToCloudinary
+                        }
+
+                        postViewModel.updatePostWithImage(editingPostId!!, bookTitle, recommendation, imageUrl) { success ->
+                            handlePostResult(success, goToProfile = true)
+                        }
+                    }
+                } else {
+                    postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
+                        handlePostResult(success, goToProfile = true)
+                    }
                 }
-            } else {
+            }
+
+            // יצירת פוסט חדש
+            else {
                 if (selectedImageUri != null) {
                     uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
                         if (imageUrl.isNullOrEmpty()) {
@@ -140,6 +159,8 @@
                 }
             }
         }
+
+
 
         private fun createNewPost(title: String, recommendation: String, userId: String, imageUrl: String?) {
             postViewModel.createPost(title, recommendation, userId, imageUrl, currentLat, currentLng) { success ->
