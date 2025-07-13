@@ -26,7 +26,7 @@ class ProfileFragment : Fragment() {
         ViewModelProvider(requireActivity(), factory)[PostViewModel::class.java]
     }
 
-    private lateinit var postAdapter: PostAdapter
+    private lateinit var postAdapter: PostAdapterProfile
     private val posts = mutableListOf<Post>()
 
     private var profileData: ProfileHeaderData? = null
@@ -80,7 +80,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostAdapter(
+        postAdapter = PostAdapterProfile(
             posts = posts,
             profileData = profileData ?: ProfileHeaderData("Username", "Bio", "email@example.com"),
             onEditClick = { post ->
@@ -103,6 +103,15 @@ class ProfileFragment : Fragment() {
             },
             onEditProfileClick = {
                 findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+            },
+            onPostClick = { post ->
+                val action = ProfileFragmentDirections.actionProfileFragmentToPostDetailsFragment(
+                    postId = post.id,
+                    bookTitle = post.bookTitle,
+                    recommendation = post.recommendation,
+                    imageUri = post.imageUri ?: ""
+                )
+                findNavController().navigate(action)
             }
         )
 

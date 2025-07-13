@@ -6,7 +6,6 @@ import androidx.room.Room
 
 class MyApp : Application() {
 
-    /** Singleton של Room זמין לכל האפליקציה */
     val database: AppDatabase by lazy {
         Room.databaseBuilder(
             this,
@@ -18,6 +17,5 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // אפשר לייצר כאן services גלובליים אחרים
     }
 }

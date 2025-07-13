@@ -7,7 +7,6 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-// Data class to hold profile header info
 data class ProfileHeaderData(
     val name: String,
     val bio: String,
@@ -15,12 +14,13 @@ data class ProfileHeaderData(
     val imageUrl: String? = null
 )
 
-class PostAdapter(
+class PostAdapterProfile(
     private val posts: MutableList<Post>,
     private var profileData: ProfileHeaderData,
     private val onEditClick: (Post) -> Unit,
     private val onDeleteClick: (Post) -> Unit,
-    private val onEditProfileClick: () -> Unit
+    private val onEditProfileClick: () -> Unit,
+    private val onPostClick: (Post) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -60,33 +60,39 @@ class PostAdapter(
         }
     }
 
-    override fun getItemCount(): Int = posts.size + 1 // +1 for header
+    override fun getItemCount(): Int = posts.size + 1 // 1 for header
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is HeaderViewHolder) {
             holder.username.text = profileData.name
             holder.bio.text = profileData.bio
             holder.email.text = profileData.email
+
             if (!profileData.imageUrl.isNullOrEmpty()) {
                 Picasso.get().load(profileData.imageUrl).into(holder.image)
             }
-            holder.btnEdit.setOnClickListener { onEditProfileClick() }
+
+            holder.btnEdit.setOnClickListener {
+                onEditProfileClick()
+            }
+
         } else if (holder is PostViewHolder) {
-            val post = posts[position - 1] // Adjust for header
+            val post = posts[position - 1]
+
             holder.title.text = post.bookTitle
             holder.recommendation.text = post.recommendation
 
-            if (!post.imagePath.isNullOrEmpty()) {
+            if (!post.imageUri.isNullOrEmpty()) {
                 holder.postImage.visibility = View.VISIBLE
-                Picasso.get().load(post.imagePath).into(holder.postImage)
+                Picasso.get().load(post.imageUri).into(holder.postImage)
             } else {
                 holder.postImage.visibility = View.GONE
             }
 
-            holder.edit.visibility = View.VISIBLE
-            holder.delete.visibility = View.VISIBLE
             holder.edit.setOnClickListener { onEditClick(post) }
             holder.delete.setOnClickListener { onDeleteClick(post) }
+
+            holder.itemView.setOnClickListener { onPostClick(post) }
         }
     }
 
@@ -96,9 +102,10 @@ class PostAdapter(
         notifyDataSetChanged()
     }
 
-
     fun updateProfileData(newProfileData: ProfileHeaderData) {
         profileData = newProfileData
-        notifyItemChanged(0) // רק פריט הכותרת מתעדכן
+        notifyItemChanged(0)
     }
+
+
 }

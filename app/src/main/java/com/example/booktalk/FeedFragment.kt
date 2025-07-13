@@ -17,7 +17,7 @@ class FeedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var postViewModel: PostViewModel
-    private lateinit var postAdapter: PostAdapterSimple
+    private lateinit var postAdapter: PostAdapterFeed
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +34,15 @@ class FeedFragment : Fragment() {
         val factory = PostViewModelFactory(app)
         postViewModel = ViewModelProvider(requireActivity(), factory)[PostViewModel::class.java]
 
-        postAdapter = PostAdapterSimple(mutableListOf())
+        postAdapter = PostAdapterFeed(mutableListOf()) { post ->
+            val action = FeedFragmentDirections.actionFeedFragmentToPostDetailsFragment(
+                postId = post.id,
+                bookTitle = post.bookTitle,
+                recommendation = post.recommendation,
+                imageUri = post.imageUri ?: ""
+            )
+            findNavController().navigate(action)
+        }
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())

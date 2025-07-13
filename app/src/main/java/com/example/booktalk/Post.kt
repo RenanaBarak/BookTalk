@@ -9,15 +9,12 @@ data class Post(
     @androidx.room.Ignore var bookTitle: String = "",
     @androidx.room.Ignore var recommendation: String = "",
     @androidx.room.Ignore var userId: String = "",
-    @androidx.room.Ignore var imagePath: String? = null,
     @androidx.room.Ignore var timestamp: Timestamp? = null,
     @androidx.room.Ignore var latitude: Double? = null,
     @androidx.room.Ignore var longitude: Double? = null,
-    @androidx.room.Ignore val imageUri: String?
-)
-{
+    @androidx.room.Ignore var imageUri: String? = null
+) {
     constructor() : this(
-        "", "", "", "", null, null, null, null, null
+        "", "", "", "", null, null, null, null
     )
 }
-

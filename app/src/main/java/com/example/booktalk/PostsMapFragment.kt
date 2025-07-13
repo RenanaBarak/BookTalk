@@ -50,7 +50,6 @@ class PostsMapFragment : Fragment(), OnMapReadyCallback {
 
         btnBackProfile = view.findViewById(R.id.btnBackProfile)
         btnBackProfile.setOnClickListener {
-
             findNavController().navigate(R.id.feedFragment)
         }
 
@@ -94,7 +93,8 @@ class PostsMapFragment : Fragment(), OnMapReadyCallback {
                     .actionPostsMapFragmentToPostDetailsFragment(
                         postId = clickedPost.id,
                         bookTitle = clickedPost.bookTitle,
-                        recommendation = clickedPost.recommendation
+                        recommendation = clickedPost.recommendation,
+                        imageUri = clickedPost.imageUri ?: ""
                     )
                 findNavController().navigate(action)
             }
@@ -164,7 +164,8 @@ class PostsMapFragment : Fragment(), OnMapReadyCallback {
         } else {
             val israel = LatLng(31.0461, 34.8516)
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 7f))
-            Toast.makeText(requireContext(), "אין פוסטים עם מיקום להצגה במפה", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "No posts with location to show on the map", Toast.LENGTH_SHORT).show()
+
         }
     }
 }

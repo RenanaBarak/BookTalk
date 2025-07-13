@@ -1,14 +1,18 @@
 package com.example.booktalk
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -16,6 +20,13 @@ import com.example.booktalk.databinding.FragmentCreatePostBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class CreatePostFragment : Fragment() {
 
@@ -32,10 +43,25 @@ class CreatePostFragment : Fragment() {
     private var currentLat: Double? = null
     private var currentLng: Double? = null
 
+    private val CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/ddaexvcdu/image/upload"
+    private val UPLOAD_PRESET = "BookTalk"
+
+    private val CAMERA_PERMISSION_CODE = 100
+
     private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             selectedImageUri = it
             binding.ivPostImage.setImageURI(it)
+        }
+    }
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val photoBitmap = result.data?.extras?.get("data") as? Bitmap
+            if (photoBitmap != null) {
+                selectedImageUri = saveImageToCache(photoBitmap)
+                binding.ivPostImage.setImageBitmap(photoBitmap)
+            }
         }
     }
 
@@ -50,10 +76,9 @@ class CreatePostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ✅ יצירת ViewModel עם Factory
         val app = requireActivity().application as MyApp
         val factory = PostViewModelFactory(app)
-        postViewModel = ViewModelProvider(this, factory).get(PostViewModel::class.java)
+        postViewModel = ViewModelProvider(this, factory)[PostViewModel::class.java]
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -66,7 +91,6 @@ class CreatePostFragment : Fragment() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         requestLocation()
 
-        // עריכת פוסט קיים
         arguments?.let {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
@@ -74,6 +98,10 @@ class CreatePostFragment : Fragment() {
 
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
+        }
+
+        binding.btnPickImage.setOnClickListener {
+            showImageSourceDialog()
         }
 
         binding.btnSubmit.setOnClickListener {
@@ -94,21 +122,158 @@ class CreatePostFragment : Fragment() {
                     handlePostResult(success, goToProfile = true)
                 }
             } else {
-                postViewModel.createPost(
-                    bookTitle,
-                    recommendation,
-                    userId,
-                    selectedImageUri?.toString(),
-                    currentLat,
-                    currentLng
-                ) { success ->
-                    handlePostResult(success, goToProfile = false)
+                if (selectedImageUri != null) {
+                    uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
+                        if (imageUrl.isNullOrEmpty()) {
+                            Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                            binding.progressBar.visibility = View.GONE
+                            binding.btnSubmit.isEnabled = true
+                            return@uploadImageToCloudinary
+                        }
+
+                        postViewModel.createPost(
+                            bookTitle,
+                            recommendation,
+                            userId,
+                            imageUrl,
+                            currentLat,
+                            currentLng
+                        ) { success ->
+                            handlePostResult(success, goToProfile = false)
+                        }
+                    }
+                } else {
+                    postViewModel.createPost(
+                        bookTitle,
+                        recommendation,
+                        userId,
+                        null,
+                        currentLat,
+                        currentLng
+                    ) { success ->
+                        handlePostResult(success, goToProfile = false)
+                    }
                 }
             }
         }
+    }
 
-        binding.btnPickImage.setOnClickListener {
-            imagePicker.launch("image/*")
+    private fun showImageSourceDialog() {
+        val options = arrayOf("Take Photo", "Choose from Gallery")
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Select Image Source")
+        builder.setItems(options) { _, which ->
+            when (which) {
+                0 -> checkCameraPermissionAndOpen()
+                1 -> imagePicker.launch("image/*")
+            }
+        }
+        builder.show()
+    }
+
+    private fun checkCameraPermissionAndOpen() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+        } else {
+            openCamera()
+        }
+    }
+
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (cameraIntent.resolveActivity(requireActivity().packageManager) != null) {
+            cameraLauncher.launch(cameraIntent)
+        } else {
+            Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun saveImageToCache(bitmap: Bitmap): Uri? {
+        return try {
+            val cachePath = File(requireContext().cacheDir, "images")
+            cachePath.mkdirs()
+            val file = File(cachePath, "post_image.png")
+            val stream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            stream.close()
+            androidx.core.content.FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                file
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun uploadImageToCloudinary(fileUri: Uri, onComplete: (String?) -> Unit) {
+        val contentResolver = requireContext().contentResolver
+        val inputStream = contentResolver.openInputStream(fileUri)
+        val requestBody = inputStream?.readBytes()?.toRequestBody("image/*".toMediaTypeOrNull())
+
+        val multipartBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", "image.jpg", requestBody!!)
+            .addFormDataPart("upload_preset", UPLOAD_PRESET)
+            .build()
+
+        val request = Request.Builder()
+            .url(CLOUDINARY_UPLOAD_URL)
+            .post(multipartBody)
+            .build()
+
+        OkHttpClient().newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Cloudinary", "Upload failed: ${e.message}")
+                requireActivity().runOnUiThread {
+                    onComplete(null)
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyString = response.body?.string() ?: ""
+                val json = JSONObject(bodyString)
+                val imageUrl = json.optString("secure_url")
+                Log.d("Cloudinary", "Uploaded image URL: $imageUrl")
+
+                requireActivity().runOnUiThread {
+                    onComplete(imageUrl)
+                }
+            }
+        })
+    }
+
+    private fun requestLocation() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                currentLat = location.latitude
+                currentLng = location.longitude
+            } else {
+                currentLat = 32.0853
+                currentLng = 34.7818
+            }
+        }.addOnFailureListener {
+            currentLat = 32.0853
+            currentLng = 34.7818
         }
     }
 
@@ -125,31 +290,6 @@ class CreatePostFragment : Fragment() {
             }
         } else {
             Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun requestLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
-            return
-        }
-
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                currentLat = location.latitude
-                currentLng = location.longitude
-                Log.d("CreatePostFragment", "Location from device: $currentLat, $currentLng")
-            } else {
-                currentLat = 32.0853
-                currentLng = 34.7818
-                Log.d("CreatePostFragment", "No location available. Using default: $currentLat, $currentLng")
-            }
-        }.addOnFailureListener {
-            currentLat = 32.0853
-            currentLng = 34.7818
-            Log.e("CreatePostFragment", "Failed to get location. Using default: $currentLat, $currentLng")
         }
     }
 

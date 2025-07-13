@@ -6,16 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModelProvider
+
 
 class PostViewModel(private val repository: PostRepository) : ViewModel() {
-    // LiveData שתצפה בטבלת הפוסטים מ-Room
     val posts = repository.allPosts
 
 
     fun listenToAllPosts() {
         repository.removeListener()
         repository.listenToAllPostsFromFirebase { firebasePosts ->
-            // שומר את הפוסטים גם בבסיס הנתונים המקומי
             viewModelScope.launch(Dispatchers.IO) {
                 repository.savePostsToLocal(firebasePosts)
             }
@@ -43,7 +43,12 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         repository.createPost(bookTitle, recommendation, userId, imageUri, lat, lng, onResult)
     }
 
-    fun updatePost(postId: String, bookTitle: String, recommendation: String, onResult: (Boolean) -> Unit) {
+    fun updatePost(
+        postId: String,
+        bookTitle: String,
+        recommendation: String,
+        onResult: (Boolean) -> Unit
+    ) {
         repository.updatePost(postId, bookTitle, recommendation, onResult)
     }
 
@@ -55,4 +60,16 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         super.onCleared()
         repository.removeListener()
     }
+
+
+    class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(PostViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return PostViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
 }
+

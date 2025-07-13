@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import android.widget.ImageView
+import com.squareup.picasso.Picasso
 
 class PostDetailsFragment : Fragment() {
 
@@ -17,7 +19,7 @@ class PostDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return inflater.inflate(R.layout.fragment_post_details, container, false)
     }
 
@@ -26,13 +28,23 @@ class PostDetailsFragment : Fragment() {
 
         val bookTitleTextView = view.findViewById<TextView>(R.id.tvBookTitle)
         val recommendationTextView = view.findViewById<TextView>(R.id.tvRecommendation)
+        val imageView = view.findViewById<ImageView>(R.id.ivPostImage)
         val btnBackToMap = view.findViewById<Button>(R.id.btnBackToMap)
 
         bookTitleTextView.text = args.bookTitle
         recommendationTextView.text = args.recommendation
 
+        if (imageView != null) {
+            if (!args.imageUri.isNullOrEmpty()) {
+                imageView.visibility = View.VISIBLE
+                Picasso.get().load(args.imageUri).into(imageView)
+            } else {
+                imageView.visibility = View.GONE
+            }
+        }
+
         btnBackToMap.setOnClickListener {
-            findNavController().navigateUp() // חוזר לעמוד הקודם (PostsMapFragment)
+            findNavController().navigateUp()
         }
     }
 }

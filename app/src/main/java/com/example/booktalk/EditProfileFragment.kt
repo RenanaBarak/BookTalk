@@ -53,7 +53,6 @@ class EditProfileFragment : Fragment() {
 
         val currentUser = auth.currentUser ?: return
 
-        // Load existing profile
         usersCollection.document(currentUser.uid).get()
             .addOnSuccessListener { snapshot ->
                 val profile = snapshot.toObject(UserProfile::class.java)
@@ -68,17 +67,14 @@ class EditProfileFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
 
-        // Set up button to change profile picture with permission checks
         binding.btnChangeProfilePicture.setOnClickListener {
             showImagePickerDialog()
         }
 
-        // Save button
         binding.btnSave.setOnClickListener {
             val name = binding.etName.text.toString().trim()
             val bio = binding.etBio.text.toString().trim()
 
-            // הצג ספינר ונטרל את כפתור השמירה
             binding.progressBar.visibility = View.VISIBLE
             binding.btnSave.isEnabled = false
 
@@ -89,7 +85,6 @@ class EditProfileFragment : Fragment() {
             }
         }
 
-        // Back to profile button
         binding.btnBackToProfile.setOnClickListener {
             findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
         }
@@ -101,7 +96,6 @@ class EditProfileFragment : Fragment() {
             binding.passwordSection.visibility = View.GONE
         }
 
-        // Change password logic
         binding.btnChangePassword.setOnClickListener {
             val currentPassword = binding.etCurrentPassword.text.toString()
             val newPassword = binding.etNewPassword.text.toString()

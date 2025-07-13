@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- NavHostFragment לתמיכה בניווט -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -14,7 +13,6 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- תפריט תחתון -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"

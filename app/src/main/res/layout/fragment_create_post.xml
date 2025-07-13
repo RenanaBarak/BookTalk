@@ -19,7 +19,6 @@
             android:text="New Recommendation"
             android:layout_marginBottom="@dimen/margin_large" />
 
-        <!-- כותרת הספר -->
         <EditText
             android:id="@+id/et_book_title"
             style="@style/AppEditText"
@@ -51,9 +50,10 @@
             android:id="@+id/btnPickImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pick Image from Gallery"
+            android:text="Add photo"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
+            style="@style/AppButton.Primary"
+            />
 
         <Button
             android:id="@+id/btn_submit"

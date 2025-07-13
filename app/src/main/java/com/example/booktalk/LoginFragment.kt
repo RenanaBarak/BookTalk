@@ -36,7 +36,7 @@ class LoginFragment : Fragment() {
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 binding.progressBar.visibility = View.VISIBLE
-                binding.btnLogin.isEnabled = false // חוסם לחיצה כפולה
+                binding.btnLogin.isEnabled = false
 
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->

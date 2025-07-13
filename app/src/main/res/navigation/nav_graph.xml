@@ -5,7 +5,6 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <!-- Login -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.booktalk.LoginFragment"
@@ -14,7 +13,6 @@
         <action android:id="@+id/action_login_to_register" app:destination="@id/registerFragment" />
     </fragment>
 
-    <!-- Register -->
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.booktalk.RegisterFragment"
@@ -23,16 +21,18 @@
         <action android:id="@+id/action_register_to_login" app:destination="@id/loginFragment" />
     </fragment>
 
-    <!-- Feed -->
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.example.booktalk.FeedFragment"
         android:label="Feed">
         <action android:id="@+id/action_feed_to_createPost" app:destination="@id/createPostFragment" />
         <action android:id="@+id/action_feedFragment_to_postsMapFragment" app:destination="@id/postsMapFragment" />
+
+        <action
+            android:id="@+id/action_feedFragment_to_postDetailsFragment"
+            app:destination="@id/postDetailsFragment" />
     </fragment>
 
-    <!-- Create Post -->
     <fragment
         android:id="@+id/createPostFragment"
         android:name="com.example.booktalk.CreatePostFragment"
@@ -45,7 +45,6 @@
         <action android:id="@+id/action_createPost_to_profileFragment" app:destination="@id/profileFragment" />
     </fragment>
 
-    <!-- Profile -->
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.booktalk.ProfileFragment"
@@ -56,9 +55,9 @@
         <action android:id="@+id/action_profileFragment_to_editProfileFragment" app:destination="@id/editProfileFragment" />
         <action android:id="@+id/action_profileFragment_to_createPostFragment" app:destination="@id/createPostFragment" />
         <action android:id="@+id/action_profileFragment_to_loginFragment" app:destination="@id/loginFragment" app:popUpTo="@id/nav_graph" app:popUpToInclusive="true" />
+        <action android:id="@+id/action_profileFragment_to_postDetailsFragment" app:destination="@id/postDetailsFragment" />
     </fragment>
 
-    <!-- Edit Profile -->
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.example.booktalk.EditProfileFragment"
@@ -66,7 +65,6 @@
         <action android:id="@+id/action_editProfileFragment_to_profileFragment" app:destination="@id/profileFragment" />
     </fragment>
 
-    <!-- Posts Map -->
     <fragment
         android:id="@+id/postsMapFragment"
         android:name="com.example.booktalk.PostsMapFragment"
@@ -76,18 +74,25 @@
         <action android:id="@+id/action_postsMapFragment_to_postDetailsFragment" app:destination="@id/postDetailsFragment" />
     </fragment>
 
-    <!-- Post Details -->
     <fragment
         android:id="@+id/postDetailsFragment"
         android:name="com.example.booktalk.PostDetailsFragment"
         android:label="Post Details">
-        <argument android:name="postId" app:argType="string" />
-        <argument android:name="bookTitle" app:argType="string" />
-        <argument android:name="recommendation" app:argType="string" />
 
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <argument
+            android:name="bookTitle"
+            app:argType="string" />
+        <argument
+            android:name="recommendation"
+            app:argType="string" />
+        <argument
+            android:name="imageUri"
+            app:argType="string"
+            android:defaultValue="" />
 
-        <action android:id="@+id/action_postDetailsFragment_to_postsMapFragment"
-            app:destination="@id/postsMapFragment" />
-    </fragment>
+      </fragment>
 
-</navigation>
+  </navigation>

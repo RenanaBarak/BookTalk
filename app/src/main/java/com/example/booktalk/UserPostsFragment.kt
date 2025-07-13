@@ -21,7 +21,7 @@ class UserPostsFragment : Fragment() {
     private lateinit var postVM: PostViewModel
     private val db = FirebaseFirestore.getInstance()
 
-    private lateinit var postAdapter: PostAdapter
+    private lateinit var postAdapter: PostAdapterProfile
     private val posts = mutableListOf<Post>()
 
     private var profileData: ProfileHeaderData? = null
@@ -72,7 +72,7 @@ class UserPostsFragment : Fragment() {
     private fun setupRecycler() {
         val header = profileData ?: return
 
-        postAdapter = PostAdapter(
+        postAdapter = PostAdapterProfile(
             posts = posts,
             profileData = header,
             onEditClick = { post ->
@@ -87,7 +87,13 @@ class UserPostsFragment : Fragment() {
                     ).show()
                 }
             },
-            onEditProfileClick = {}
+            onEditProfileClick = {
+                Toast.makeText(requireContext(), "Edit profile clicked", Toast.LENGTH_SHORT).show()
+            },
+            onPostClick = { post ->
+                Toast.makeText(requireContext(), "Post clicked: ${post.bookTitle}", Toast.LENGTH_SHORT).show()
+
+            }
         )
 
         binding.recyclerUserPosts.apply {
@@ -95,6 +101,7 @@ class UserPostsFragment : Fragment() {
             adapter = postAdapter
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

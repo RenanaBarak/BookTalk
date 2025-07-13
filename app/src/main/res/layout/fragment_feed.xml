@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/bg_light">
 
-    <!-- כפתור MAP בצד ימין למעלה -->
     <Button
         android:id="@+id/btnOpenMap"
         android:layout_width="wrap_content"
@@ -20,7 +19,6 @@
         android:textStyle="bold"
         android:padding="12dp" />
 
-    <!-- רשימת פוסטים מתחת לכפתור -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -31,7 +29,6 @@
         android:clipToPadding="false"
         tools:listitem="@layout/item_post" />
 
-    <!-- טוען -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
