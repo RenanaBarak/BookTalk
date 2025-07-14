@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="nav_item_color">#5D5A58</color>
+    <color name="colorPrimary">#D5BDAF</color>
+    <color name="colorSecondary">#E3D5CA</color>
+    <color name="colorTextPrimary">#4B4B4B</color>
+    <color name="colorTextHint">#888888</color>
+    <color name="colorBackground">#EDEDE9</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlue">#1E90FF</color>
+    <color name="colorRed">#A52A2A</color>
+        <color name="colorEditTextBackground">#E3D5CA</color>
+        <color name="colorText">#4B4B4B</color>
+        <color name="colorHint">#888888</color>
+    <color name="bg_light">#EDEDE9</color>
+    <color name="primary_button">#D5BDAF</color>
+
+</resources>
