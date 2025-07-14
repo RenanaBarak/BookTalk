@@ -3,61 +3,53 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background= "#EDEDE9"
-    android:padding="16dp">
+    android:background="@color/colorBackground"
+    android:padding="@dimen/margin_medium">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
         <EditText
             android:id="@+id/et_email_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/AppEditText"
             android:hint="Email"
-            android:backgroundTint="#E3D5CA"
-            android:padding="12dp"
-            android:textColor="#4B4B4B"
-            android:textColorHint="#888888"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="@dimen/margin_medium" />
 
         <EditText
             android:id="@+id/et_password_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/AppEditText"
             android:hint="Password"
-            android:backgroundTint="#E3D5CA"
-            android:padding="12dp"
-            android:textColor="#4B4B4B"
-            android:textColorHint="#888888"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:layout_marginBottom="@dimen/margin_medium" />
 
         <EditText
             android:id="@+id/et_confirm_password_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/AppEditText"
             android:hint="Confirm Password"
-            android:backgroundTint="#E3D5CA"
-            android:padding="12dp"
-            android:textColor="#4B4B4B"
-            android:textColorHint="#888888"
-            android:textSize="18sp"
-            android:layout_marginBottom="20dp"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:layout_marginBottom="@dimen/margin_large" />
 
         <Button
             android:id="@+id/btn_register"
-            android:layout_width="match_parent"
+            style="@style/AppButton.Primary"
+            android:text="Register" />
+
+        <Button
+            android:id="@+id/btn_go_to_login"
+            style="@style/AppButton.Secondary"
+            android:text="Already have an account? Login"
+            android:layout_marginTop="@dimen/margin_medium" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Register"
-            android:backgroundTint="#D5BDAF"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp" />
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
 
     </LinearLayout>
 </ScrollView>

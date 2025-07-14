@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190827355143",
+    "project_id": "booktalk-d49ca",
+    "storage_bucket": "booktalk-d49ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190827355143:android:a63cef9de80e43227f9ea2",
+        "android_client_info": {
+          "package_name": "com.example.booktalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJeG8x88DcRCqnZEEdxJk2XgVLi1BW8Fo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

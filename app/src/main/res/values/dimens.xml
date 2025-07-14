@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_default">12dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">12dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_xlarge">24dp</dimen>
+    <dimen name="text_size_large">24sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="text_size_title">26sp</dimen>
+    <dimen name="corner_radius">12dp</dimen>
+    <dimen name="padding_medium">12dp</dimen>
+    <dimen name="profile_image_size">100dp</dimen>
+    <dimen name="space_small">8dp</dimen>
+    <dimen name="space_medium">16dp</dimen>
+    <dimen name="space_large">80dp</dimen>
+    <dimen name="button_padding">12dp</dimen>
+
+</resources>

@@ -1,56 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EDEDE9"
-    android:padding="16dp">
+    android:background="@color/colorBackground">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal">
+        android:text="Logout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:backgroundTint="#D5BDAF"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginTop="12dp" />
 
-        <TextView
-            android:id="@+id/tv_profile_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your Profile"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#D5BDAF"
-            android:layout_marginBottom="24dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profilePostsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btnLogout"
+        android:padding="@dimen/space_small"
+        android:clipToPadding="false"
+        android:background="@color/colorBackground" />
 
-        <TextView
-            android:id="@+id/tv_user_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="user@example.com"
-            android:textSize="18sp"
-            android:textColor="#5D5A58"
-            android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/btn_edit_profile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Edit Profile"
-            android:backgroundTint="#E3D5CA"
-            android:textColor="#4B4B4B"
-            android:textStyle="bold"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:backgroundTint="#D5BDAF"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp" />
-
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>
