@@ -22,8 +22,31 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // BottomNavigation setup
-        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+        // Set up BottomNavigationView manually to avoid "same destination" issue
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            val currentDestination = navController.currentDestination?.id
+            when (item.itemId) {
+                R.id.feedFragment -> {
+                    if (currentDestination != R.id.feedFragment) {
+                        navController.navigate(R.id.feedFragment)
+                    }
+                    true
+                }
+                R.id.createPostFragment -> {
+                    if (currentDestination != R.id.createPostFragment) {
+                        navController.navigate(R.id.createPostFragment)
+                    }
+                    true
+                }
+                R.id.profileFragment -> {
+                    if (currentDestination != R.id.profileFragment) {
+                        navController.navigate(R.id.profileFragment)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
 
         // Hide bottom nav in login/register fragments
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -34,11 +57,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Initialize Cloudinary
+        // Initialize Cloudinary (if needed)
         val config: HashMap<String, String> = HashMap()
         config["cloud_name"] = "ddaexvcdu"
         config["api_key"] = "269842741757611"
         config["api_secret"] = "mqC83IzTe8Ar4IZVeX4V9Po2nV8"
-
     }
 }

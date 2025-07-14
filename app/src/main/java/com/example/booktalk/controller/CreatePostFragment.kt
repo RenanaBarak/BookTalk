@@ -20,13 +20,12 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.booktalk.controller.PostViewModel
-import com.example.booktalk.controller.PostViewModelFactory
 import com.example.booktalk.R
 import com.example.booktalk.databinding.FragmentCreatePostBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -49,6 +48,7 @@ class CreatePostFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
 
     private var editingPostId: String? = null
+    private var existingImageUrl: String? = null // <-- Added to keep track of old image URL
     private var selectedImageUri: Uri? = null
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -107,8 +107,19 @@ class CreatePostFragment : Fragment() {
             editingPostId = it.getString("postId")
             val bookTitle = it.getString("bookTitle") ?: ""
             val recommendation = it.getString("recommendation") ?: ""
+            existingImageUrl = it.getString("imageUrl") // <-- get existing image URL
+
             binding.etBookTitle.setText(bookTitle)
             binding.etRecommendation.setText(recommendation)
+
+            // Load existing image only if no new image selected yet
+            if (!existingImageUrl.isNullOrEmpty() && selectedImageUri == null) {
+                Picasso.get()
+                    .load(existingImageUrl)
+                    .placeholder(R.drawable.girl_read_book)
+                    .error(R.drawable.girl_read_book)
+                    .into(binding.ivPostImage)
+            }
         }
 
         binding.btnPickImage.setOnClickListener {
@@ -132,9 +143,10 @@ class CreatePostFragment : Fragment() {
         binding.progressBar.visibility = View.VISIBLE
         binding.btnSubmit.isEnabled = false
 
-        // עריכת פוסט קיים
+        // Editing an existing post
         if (!editingPostId.isNullOrEmpty()) {
             if (selectedImageUri != null) {
+                // If user selected a new image, upload it
                 uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
                     if (imageUrl.isNullOrEmpty()) {
                         Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
@@ -147,14 +159,20 @@ class CreatePostFragment : Fragment() {
                         handlePostResult(success, goToProfile = true)
                     }
                 }
+            } else if (!existingImageUrl.isNullOrEmpty()) {
+                // No new image selected, keep the existing image URL
+                postViewModel.updatePostWithImage(editingPostId!!, bookTitle, recommendation, existingImageUrl!!) { success ->
+                    handlePostResult(success, goToProfile = true)
+                }
             } else {
+                // No image at all
                 postViewModel.updatePost(editingPostId!!, bookTitle, recommendation) { success ->
                     handlePostResult(success, goToProfile = true)
                 }
             }
         }
 
-        // יצירת פוסט חדש
+        // Creating a new post
         else {
             if (selectedImageUri != null) {
                 uploadImageToCloudinary(selectedImageUri!!) { imageUrl ->
@@ -171,8 +189,6 @@ class CreatePostFragment : Fragment() {
             }
         }
     }
-
-
 
     private fun createNewPost(title: String, recommendation: String, userId: String, imageUrl: String?) {
         postViewModel.createPost(title, recommendation, userId, imageUrl, currentLat, currentLng) { success ->

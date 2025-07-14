@@ -40,6 +40,7 @@
         <argument android:name="postId" app:argType="string" android:defaultValue="" />
         <argument android:name="bookTitle" app:argType="string" android:defaultValue="" />
         <argument android:name="recommendation" app:argType="string" android:defaultValue="" />
+        <argument android:name="imageUrl" app:argType="string" android:defaultValue="" />
 
         <action android:id="@+id/action_createPost_to_feed" app:destination="@id/feedFragment" />
         <action android:id="@+id/action_createPost_to_profileFragment" app:destination="@id/profileFragment" />

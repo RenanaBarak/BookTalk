@@ -93,7 +93,8 @@ class ProfileFragment : Fragment() {
                 val action = ProfileFragmentDirections.actionProfileFragmentToEditPostFragment(
                     postId = post.id,
                     bookTitle = post.bookTitle,
-                    recommendation = post.recommendation
+                    recommendation = post.recommendation,
+                    imageUrl = post.imageUri ?: ""
                 )
                 findNavController().navigate(action)
             },
@@ -118,7 +119,8 @@ class ProfileFragment : Fragment() {
                 val action = ProfileFragmentDirections.actionProfileFragmentToEditPostFragment(
                     postId = post.id,
                     bookTitle = post.bookTitle,
-                    recommendation = post.recommendation
+                    recommendation = post.recommendation,
+                    imageUrl = post.imageUri ?: ""
                 )
                 findNavController().navigate(action)
             }
